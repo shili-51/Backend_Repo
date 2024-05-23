@@ -19,6 +19,12 @@ Node JS notes.
 /src/utils/ - if a functionality repeats itself, its kept in this utils folder
 
 
-###########
+####  Prettier Code Extension
 .prettiererc - how prettier extension will work
 .prettierignore - files which we want to ignore through prettier
+
+
+###### dotenv package
+
+To use env variable in your code
+
