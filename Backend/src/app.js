@@ -19,6 +19,7 @@ app.use(express.urlencoded({extended: true, limit: "16kb"}))
 // static - to store files folder containing images, favicon etc
 app.use(express.static("public"))
 
+// app.use is used for middlewares
 app.use(cookieParser())
 
 
