@@ -4,6 +4,7 @@ import {User} from "../models/user.model.js";
 import { uploadCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 
 const generateAccessAndRefreshTokens = async (userId) => {
     try {
@@ -122,6 +123,10 @@ const loginUser = asyncHandler( async (req, res) => {
 
     const {email, username, password} = req.body
 
+    // console.log(username, "username")
+    // console.log(email, "email")
+    // console.log(password, "password")
+
     if (!(username || email)) {
         throw new ApiError(400, "username or password is required")
     }
@@ -192,6 +197,8 @@ const logoutUser = asyncHandler( async (req, res) => {
 })
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
+    // console.log(req.cookies,"req.cookies")
+    // console.log(req.body,"req.body")
     const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken
 
     if(!incomingRefreshToken) {
@@ -242,15 +249,25 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
 const changeCurrentPassword = asyncHandler(async (req, res) => {
     const {oldPassword, newPassword} = req.body
+
+    // console.log(oldPassword, "oldPassword")
+    // console.log(newPassword, "newPassword")
+    
     
     const user = await User.findById(req.user?._id)
+    // console.log(user, "user")
+    
     const isPasswordCorrect = await user.isPasswordCorrect(oldPassword)
 
+    // console.log(isPasswordCorrect, "isPasswordCorrect")
+    
     if (!isPasswordCorrect) {
         throw new ApiError(400, "Invalid old password")
     }
 
     user.password = newPassword
+    // console.log(user.password, "user.password")
+    
     await user.save({validateBeforeSave: false})
 
     return res
@@ -259,9 +276,13 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
 })
 
 const getCurrentUser = asyncHandler(async (req, res) => {
+    
+    // console.log(user, "User")
     return res
     .status(200)
-    .json(200, req.user, "Current user fetched successfully!")
+    .json(
+        new ApiResponse(200, req.user, "Current user fetched successfully!")
+    )
 })
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
@@ -284,7 +305,9 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
 
     return res
     .status(200)
-    .json(200, user, "Account details updated succesfully!")
+    .json(
+        new ApiResponse(200, user, "Account details updated succesfully!")
+    )
 
 })
 
@@ -352,8 +375,10 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
 
 const getUserChannelProfile = asyncHandler(async (req, res) => {
     const {username} = req.params
+    // console.log(username, "username")
+    // console.log(username?.trim(), "username?.trim()")
 
-    if (username?.trim()) {
+    if (!username?.trim()) {
         throw new ApiError(400, "username is missing")
     }
 
@@ -380,7 +405,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
             }
         },
         {
-            $addFileds: {
+            $addFields: {
                 subscriberCount: {
                     $size: "$subscribers",
                 },
